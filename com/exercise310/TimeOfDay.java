@@ -62,9 +62,6 @@ public class TimeOfDay {
 		int newHours=hoursVal;
 		boolean switchTime=false;
 		counter = parseCounter(counter); //cancelling out any 24 hour shifts
-		if(newHours==12&&counter>0){
-			switchTime=true; 
-		}
 		while(counter!=0){
 			newHours++;
 			counter--;
@@ -87,21 +84,24 @@ public class TimeOfDay {
 		int otherMinutes=other.getMinute();
 		int otherSeconds=other.getSecond();
 		String otherAmPm=other.getAmPm();
-		if(!otherAmPm.equals(amPmVal)){
-			otherHours+=12;
+		if(!(otherAmPm.equalsIgnoreCase(amPmVal))){
+			System.out.println("here");
+			if(otherAmPm.equals("PM")){
+				otherHours+=12;
+			}
+			if(amPmVal.equals("PM")){
+				hoursVal+=12;
+			}
 		}
+		
+		otherHours-=hoursVal;
+		otherMinutes-=minutesVal;
+		otherSeconds-=secondsVal;
 
 		otherSeconds+=otherHours*HOURS_TO_SECONDS;
-		otherSeconds+=otherHours*MINUTES_TO_SECONDS;
+		otherSeconds+=otherMinutes*MINUTES_TO_SECONDS;
 		
-		int thisSeconds=secondsVal + minutesVal*MINUTES_TO_SECONDS
-			+ hoursVal*HOURS_TO_SECONDS;
-		
-		int hourDiff=Math.abs(otherHours-hoursVal);
-		int minuteDiff=otherMinutes-minutesVal;
-		int secondDiff=otherSeconds-secondsVal;
-		
-		int returnVal=
+		return otherSeconds;
 	}
 
 	public String getAmPm(){
@@ -158,10 +158,6 @@ public class TimeOfDay {
 		return newAmVal;
 	}
 	
-	private TimeOfDay modularArithmeticSucks(int seconds){
-		//30 lines (not counting whitespace)! booyah!
-		
-	}
 	
 	public String toString(){
 		return hoursVal+" "+minutesVal+" "+secondsVal+" "+amPmVal;
