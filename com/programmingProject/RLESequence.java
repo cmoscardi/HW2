@@ -41,6 +41,13 @@ public class RLESequence {
 		compressedSequence.trimToSize();
 	}
 	
+	public void increment(int byWhat){
+		for (Entry e: compressedSequence){
+			System.out.println("here");
+			e.setValue(e.getValue()+byWhat);
+		}
+	}
+	
 	public void tailReplace (int startIndex, RLESequence otherSequence)throws Exception{
 		int counter=0;
 		int internalIndex=0;
@@ -54,15 +61,15 @@ public class RLESequence {
 				counter++;
 			}
 		}
-		System.out.println("internalIndex " + internalIndex);
-		System.out.println("indexFromEnd" + indexFromEnd);
-		System.out.println(this);
-		System.out.println(compressedSequence.size());
-		System.out.println(compressedSequence.get(2));
+	//	System.out.println("internalIndex " + internalIndex);
+	//	System.out.println("indexFromEnd" + indexFromEnd);
+	//	System.out.println(this);
+	//	System.out.println(compressedSequence.size());
+	//	System.out.println(compressedSequence.get(2));
 		
 		for(int i=compressedSequence.size()-1;i>internalIndex;i--){
-			System.out.println("wtf");
-			System.out.println(compressedSequence.get(i));
+		//	System.out.println("wtf");
+		//	System.out.println(compressedSequence.get(i));
 			compressedSequence.remove(i);
 		}
 		compressedSequence.get(internalIndex).setNumber(
@@ -71,12 +78,12 @@ public class RLESequence {
 			compressedSequence.remove(internalIndex);
 			internalIndex--;
 		}
-		System.out.println("hey "+this);
+		//System.out.println("hey "+this);
 		
 		
 		Entry cat = compareTwo(otherSequence.compressedSequence.get(0),
 							   compressedSequence.get(internalIndex));
-		System.out.println("catVal=" + cat);
+		//System.out.println("catVal=" + cat);
 		if(cat!=null){
 			System.out.println(indexFromEnd);
 			compressedSequence.set(internalIndex, cat);
