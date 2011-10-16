@@ -41,14 +41,71 @@ public class RLESequence {
 		compressedSequence.trimToSize();
 	}
 	
+	public void tailReplace (int startIndex, RLESequence otherSequence)throws Exception{
+		int counter=0;
+		int internalIndex=0;
+		int indexFromEnd=0;
+		for(int j=0;j<compressedSequence.size();j++){
+			for(int k=0;k<compressedSequence.get(j).getNumber();k++){
+				if(counter==startIndex){
+					internalIndex=j;
+					indexFromEnd=compressedSequence.get(j).getNumber()- 1 - k;
+				}
+				counter++;
+			}
+		}
+		System.out.println("internalIndex " + internalIndex);
+		System.out.println("indexFromEnd" + indexFromEnd);
+		System.out.println(this);
+		System.out.println(compressedSequence.size());
+		System.out.println(compressedSequence.get(2));
+		
+		for(int i=compressedSequence.size()-1;i>internalIndex;i--){
+			System.out.println("wtf");
+			System.out.println(compressedSequence.get(i));
+			compressedSequence.remove(i);
+		}
+		compressedSequence.get(internalIndex).setNumber(
+				compressedSequence.get(internalIndex).getNumber()-indexFromEnd-1);
+		if(compressedSequence.get(internalIndex).getNumber()==0){
+			compressedSequence.remove(internalIndex);
+			internalIndex--;
+		}
+		System.out.println("hey "+this);
+		
+		
+		Entry cat = compareTwo(otherSequence.compressedSequence.get(0),
+							   compressedSequence.get(internalIndex));
+		System.out.println("catVal=" + cat);
+		if(cat!=null){
+			System.out.println(indexFromEnd);
+			compressedSequence.set(internalIndex, cat);
+		}
+		else{
+			compressedSequence.get(internalIndex).setNumber(
+					compressedSequence.get(internalIndex).getNumber()-1);
+			if(compressedSequence.get(internalIndex).getNumber()==0){
+				compressedSequence.set(internalIndex, otherSequence.compressedSequence.get(0));
+			}
+			else{
+				compressedSequence.add(otherSequence.compressedSequence.get(0));
+			}
+		}
+		for(int i=1;i<otherSequence.compressedSequence.size();i++){
+			compressedSequence.add(otherSequence.compressedSequence.get(i));
+		}
+		
+	}
+	
+	
 	/**
-	 * Retreives the value at index i of the uncompressed string <br>
+ * Retreives the value at index i of the uncompressed string <br>
 	 * Indices start at 0, because we're computer scientists!
 	 * @param i the uncompressed index
 	 * @return the value at the index. if 300, the value you
 	 * @throws the value you input isn't in there
 	 */
-	public int get(int index)throws Exception{
+ 	public int get(int index)throws Exception{
 		int counter=0;
 		for (int j=0;j<compressedSequence.size();j++){
 			for(int k=0;k<compressedSequence.get(j).getNumber();k++){
@@ -96,13 +153,19 @@ public class RLESequence {
 	}
 	
 	private void setStepTwo(int entryIndex, int newIndex, int val)throws Exception{
+		Entry indexMinusOne=null;
 		System.out.println("entryIndex=" + entryIndex);
 		Entry containingIndex = compressedSequence.get(entryIndex);
 		System.out.println("containingIndex="+containingIndex);
-		Entry indexMinusOne=compressedSequence.get(entryIndex-1);
-		System.out.println("indexMinusOne="+indexMinusOne);
-		Entry indexPlusOne=compressedSequence.get(entryIndex+1);
-		System.out.println("indexPlusOne="+indexPlusOne);
+		if(entryIndex>0){
+			indexMinusOne=compressedSequence.get(entryIndex-1);
+			System.out.println("indexMinusOne="+indexMinusOne);
+		}
+		Entry indexPlusOne=null;
+		if(entryIndex<compressedSequence.size()-1){
+			indexPlusOne=compressedSequence.get(entryIndex+1);
+			System.out.println("indexPlusOne="+indexPlusOne);
+		}
 		//case 1
 		if (containingIndex.getNumber()==1){
 			containingIndex.setValue(val);
@@ -197,6 +260,9 @@ public class RLESequence {
 	 */
 	private Entry compareTwo(Entry firstEntry, Entry secondEntry) throws Exception{
 		Entry returnEntry=null;
+		if(firstEntry==null||secondEntry==null){
+			return returnEntry;
+		}
 		int finalValue=firstEntry.getNumber();
 		if(firstEntry.getValue()==secondEntry.getValue()){
 			finalValue+=secondEntry.getNumber();
