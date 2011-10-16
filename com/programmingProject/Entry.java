@@ -11,10 +11,35 @@ public class Entry {
 		}
 		number=(short)numberOf;
 		value=valueOf;
-		System.out.println("cool");
 	}
 	
+	public int getNumber(){
+		return number;
+	}
+	
+	public int getValue(){
+		return value;
+	}
+	
+	public void setNumber(int newNumber){
+		number=(short) newNumber;
+	}
+	
+	public void setValue(int newValue){
+		value=(short) newValue;
+	}
 	public String toString(){
-		return "("+number+")"+","+"("+value+")";
+		return "("+number+""+","+""+value+")";
+	}
+	
+	public boolean equals(Entry otherEntry){
+		if(number==otherEntry.number){
+			if(value==otherEntry.value){
+				return true;
+			}
+			else return false;
+		}
+		else return false;
 	}
 }
+
