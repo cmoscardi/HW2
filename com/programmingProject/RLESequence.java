@@ -9,13 +9,10 @@ public class RLESequence {
 		compressedSequence = new ArrayList<Entry>(lengthUncompressed);
 	}
 
-	public RLESequence(int[] inputUnCompressed)throws Exception{
+	public RLESequence(int[] inputUnCompressed) throws Exception{
 		compressedSequence = new ArrayList<Entry>(inputUnCompressed.length);
 		compress(inputUnCompressed);
-		if (compressedSequence.size()==inputUnCompressed.length){
-			
-			throw new Exception("you haven't saved much space");
-		}
+
 	}
 	
 	public RLESequence(){
@@ -127,21 +124,8 @@ public class RLESequence {
 	}
 	
 	public void set(int index, int val) throws Exception{
-		int newIndex=index;
-		int counter=0;
-		Entry indexedEntry=null;
-		int entryIndex = -2;
-		for(int j=0;j<compressedSequence.size();j++){
-			for(int k=0;k<compressedSequence.get(j).getNumber();k++){
-				if(counter==index){
-					indexedEntry=compressedSequence.get(j);
-					entryIndex=j;
-					newIndex=k;
-					System.out.println("newIndex="+newIndex);
-				}
-				counter++;
-			}
-		}
+		int[] indices = getInternalIndices(index);
+		Entry indexedEntry=compressedSequence.get(indices[0]);
 		
 		//first, check this to escape unnecessary calculation
 		//
@@ -152,32 +136,32 @@ public class RLESequence {
 		
 		//then
 		
-		setStepTwo(entryIndex, newIndex, val);
+		setStepTwo(indices[0], indices[1], val);
 		
 		
 		
 		
 	}
 	
-	private void setStepTwo(int entryIndex, int newIndex, int val)throws Exception{
-		Entry indexMinusOne=null;
-		System.out.println("entryIndex=" + entryIndex);
-		Entry containingIndex = compressedSequence.get(entryIndex);
-		System.out.println("containingIndex="+containingIndex);
+	private void setStepTwo(int entryIndex, int indexWithinEntry, int val)throws Exception{
+		Entry previousEntry=null;
+		//System.out.println("entryIndex=" + entryIndex);
+		Entry currentEntry = compressedSequence.get(entryIndex);
+		//System.out.println("containingIndex="+containingIndex);
 		if(entryIndex>0){
-			indexMinusOne=compressedSequence.get(entryIndex-1);
-			System.out.println("indexMinusOne="+indexMinusOne);
+			previousEntry=compressedSequence.get(entryIndex-1);
+			System.out.println("indexMinusOne="+previousEntry);
 		}
-		Entry indexPlusOne=null;
+		Entry nextEntry=null;
 		if(entryIndex<compressedSequence.size()-1){
-			indexPlusOne=compressedSequence.get(entryIndex+1);
-			System.out.println("indexPlusOne="+indexPlusOne);
+			nextEntry=compressedSequence.get(entryIndex+1);
+			System.out.println("indexPlusOne="+nextEntry);
 		}
 		//case 1
-		if (containingIndex.getNumber()==1){
-			containingIndex.setValue(val);
-			Entry firstCompare = compareTwo(indexMinusOne,containingIndex);
-			Entry secondCompare = compareTwo(containingIndex,indexPlusOne);
+		if (currentEntry.getNumber()==1){
+			currentEntry.setValue(val);
+			Entry firstCompare = compareTwo(previousEntry,currentEntry);
+			Entry secondCompare = compareTwo(currentEntry,nextEntry);
 	
 			if (firstCompare!=null&&secondCompare!=null){
 				Entry thirdCompare = compareTwo(firstCompare,secondCompare);
@@ -202,19 +186,19 @@ public class RLESequence {
 			
 			Entry previousStuff=null;
 			Entry nextStuff=null;
-			Entry currentEntry=null;
-			for(int i=0;i<containingIndex.getNumber();i++){
-				if(i==newIndex){
+			Entry userInsertedEntry=null;
+			for(int i=0;i<currentEntry.getNumber();i++){
+				if(i==indexWithinEntry){
 					if(i!=0){
 						System.out.println("previousStuff is good");
 						System.out.println(i);
-						previousStuff=new Entry(i,containingIndex.getValue());
+						previousStuff=new Entry(i,currentEntry.getValue());
 					}
-					if(i<containingIndex.getNumber()-1){
+					if(i<currentEntry.getNumber()-1){
 						System.out.println("nextStuff is good");
-						nextStuff=new Entry(containingIndex.getNumber()-i-1,containingIndex.getValue());
+						nextStuff=new Entry(currentEntry.getNumber()-i-1,currentEntry.getValue());
 					}
-					currentEntry = new Entry(1, val);
+					userInsertedEntry = new Entry(1, val);
 				}
 
 			}
@@ -222,31 +206,31 @@ public class RLESequence {
 				System.out.println("previousStuff=" + previousStuff);
 				System.out.println("nextStuff=" + nextStuff);
 				System.out.println("here");
-				compressedSequence.set(entryIndex,currentEntry);
+				compressedSequence.set(entryIndex,userInsertedEntry);
 				compressedSequence.add(entryIndex+1,nextStuff);
 				compressedSequence.add(entryIndex,previousStuff);
 			}
 			else if(previousStuff!=null){
-				Entry one= compareTwo(indexPlusOne,currentEntry);
+				Entry one= compareTwo(nextEntry,userInsertedEntry);
 				if(one!=null){
 					compressedSequence.set(entryIndex+1, one);
-					containingIndex.setNumber(containingIndex.getNumber()-1);
+					currentEntry.setNumber(currentEntry.getNumber()-1);
 				}
 				else {
-					compressedSequence.set(entryIndex,currentEntry);
+					compressedSequence.set(entryIndex,userInsertedEntry);
 					compressedSequence.add(entryIndex,previousStuff);
 				}
 			}
 			else if(nextStuff!=null){
-				Entry two= compareTwo(indexMinusOne,currentEntry);
+				Entry two= compareTwo(previousEntry,userInsertedEntry);
 				if(two!=null){
 					System.out.println("heree");
 					System.out.println(two);
 					compressedSequence.set(entryIndex-1, two);
-					containingIndex.setNumber(containingIndex.getNumber()-1);			
+					currentEntry.setNumber(currentEntry.getNumber()-1);			
 				}
 				else{
-					compressedSequence.set(entryIndex,currentEntry);
+					compressedSequence.set(entryIndex,userInsertedEntry);
 					compressedSequence.add(entryIndex+1,nextStuff);
 				}
 			}
@@ -293,6 +277,34 @@ public class RLESequence {
 		return true;
 	}
 	
+	/**
+	 * index 0 is the Entry <br>
+	 * index 1 is the index within that Entry
+	 * @return
+	 */
+	private int[] getInternalIndices(int externalIndex){
+		int counter=0;
+		int internalIndex=-2;
+		int entryIndex = -2;
+		
+		for(int j=0;j<compressedSequence.size();j++){
+			for(int k=0;k<compressedSequence.get(j).getNumber();k++){
+				if(counter==externalIndex){
+					entryIndex=j;
+					internalIndex=k;
+					System.out.println("newIndex="+internalIndex);
+					int[] returnVal={entryIndex,internalIndex};
+					return returnVal;
+				}
+				counter++;
+			}
+		}
+		//this should not be reached, but if it is,
+		//you'll get a -2
+		int[] returnVal={entryIndex,internalIndex};
+		return returnVal;
+	}
+
 	public int[] toArray(){
 		int[] returnArray;
 		int counter=0;
@@ -339,7 +351,7 @@ public class RLESequence {
 			for(int j=0;j<compressedSequence.get(i).getNumber();j++){
 				//System.out.println(i);
 				returnString+=compressedSequence.get(i).getValue();
-				returnString+=",";
+				returnString+=" ";
 			}
 		}
 		returnString=returnString.substring(0,returnString.length()-1);

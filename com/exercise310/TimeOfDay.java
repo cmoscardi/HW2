@@ -9,7 +9,7 @@ public class TimeOfDay {
 	private int minutesVal;
 	private int secondsVal;
 	private String amPmVal;
-	public TimeOfDay(int hours, int minutes, int seconds, String amPm){
+	public TimeOfDay(int hours, int minutes, int seconds, String amPm) throws IllegalArgumentException{
 			hoursVal=hours;
 			minutesVal=minutes;
 			secondsVal=seconds;
@@ -17,8 +17,6 @@ public class TimeOfDay {
 			if(!conditionCheck()){
 				throw new IllegalArgumentException("One of your arguments is invalid. Check to see the possible argument values");
 			}
-				
-			
 			
 		}
 	
