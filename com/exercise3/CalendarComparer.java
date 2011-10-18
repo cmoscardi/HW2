@@ -5,24 +5,31 @@ import java.util.GregorianCalendar;
 
 public class CalendarComparer {
 	/**
-	 * The epoch we are living in. I wish we could live in the epoch of beiber.
-	 * It's too bad that we can't change the epoch, though conveniently enough 
-	 * 1970 is 2 years before a leap year, just like 1994
+	 * This class does 1 thing and 1 thing only.
+	 * It compares today's date to the day Justin Beiber
+	 *  was born.  
 	 */
 	private static final int MILLIS_IN_SECOND = 1000;
 	private static final int SECONDS_IN_MINUTE = 60;
 	private static final int MINUTES_IN_HOUR = 60;
 	private static final int HOURS_IN_DAY = 24;
 	
-	private GregorianCalendar bieber;
+	private GregorianCalendar bieber; 
 	private GregorianCalendar today;
 
-	
+	/**
+	 * Constructs the object with the date on which you constructed
+	 * it. 
+	 */
 	public CalendarComparer(){
 		bieber = new GregorianCalendar(1994, 2, 1);
 		today = new GregorianCalendar();
 	}
-	
+	/**
+	 * compares today's date to his date
+	 * @return the number of days between today and
+	 * his birthday
+	 */
 	public int compareValues(){
 		Date biebDate = bieber.getTime();
 		Date todayDate = today.getTime();
@@ -37,5 +44,5 @@ public class CalendarComparer {
 		return (int) daysCalc; 
 		
 		}
-	
+	//flute
 }

@@ -1,20 +1,36 @@
 
 package com.programmingProject;
+/**
+ * This is best used in conjunction
+ * with the RLEImage class. It is to compress
+ * the rows of the RLEImage matrix of pixels
+ */
 public class RLEEntry {
 
-		//who's your daddy
-		private short number;
+		private int number;
 		private RLESequence value;
 		
+		/**
+		 * 
+		 * @param numberOf the number of rows
+		 * @param valueOf
+		 */
 		public RLEEntry(int numberOf, RLESequence valueOf) {
-			number=(short)numberOf;
+			number=numberOf;
 			value=valueOf;
 		}
-		
+		/**
+		 * 
+		 * @return how many rows it stores
+		 */
 		public int getNumber(){
 			return number;
 		}
-		
+		/**
+		 * 
+		 * @return the sequence which is compressed 
+		 * in these rows
+		 */
 		public RLESequence getValue(){
 			return value;
 		}

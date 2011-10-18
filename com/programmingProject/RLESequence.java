@@ -5,20 +5,39 @@ import java.util.ArrayList;
 public class RLESequence {
 	private ArrayList<Entry> compressedSequence;
 	
+	/**
+	 * Makes an empty sequence for your compressing 
+	 * pleasure
+	 * @param lengthUncompressed self-explanatory
+	 */
 	public RLESequence(int lengthUncompressed){
 		compressedSequence = new ArrayList<Entry>(lengthUncompressed);
 	}
-
+	/**
+	 * Takes an uncompressed array and compresses it. This is the 
+	 * constructor you want to use. 
+	 * @param inputUnCompressed the uncompressed array
+	 */
 	public RLESequence(int[] inputUnCompressed) throws Exception{
 		compressedSequence = new ArrayList<Entry>(inputUnCompressed.length);
 		compress(inputUnCompressed);
 
 	}
 	
+	/**
+	 * constructs a sequence of default length. 300 is that length, 
+	 * completely arbitrarily. if you, the user of this program, ever want
+	 * that changed, send me an email or something
+	 */
 	public RLESequence(){
 		compressedSequence = new ArrayList<Entry>(300);
 	}
 	
+	/**
+	 * private!
+	 * @param uncompressedArray
+	 * @throws Exception
+	 */
 	private void compress(int[] uncompressedArray) throws Exception{
 		int counter=0;
 		int lastVal=uncompressedArray[0]; 
@@ -37,15 +56,30 @@ public class RLESequence {
 		compressedSequence.add(new Entry(counter,lastVal));
 		compressedSequence.trimToSize();
 	}
-	
-	public void increment(int byWhat){
+	/**
+	 * increments every value in the sequence by (what?)..
+	 * <br> you can decrement if you want to. But values 
+	 * below 0 will be REJECTED. As will values above 255
+	 * @param byWhat this much!
+	 * @throws if you give a bogus value
+	 */
+	public void increment(int byWhat) throws Exception{
 		for (Entry e: compressedSequence){
-			System.out.println("here");
 			e.setValue(e.getValue()+byWhat);
+			if(e.getValue()>255||e.getValue()<0){
+				throw new Exception("too big value");
+			}
 		}
 	}
 	
-	public void tailReplace (int startIndex, RLESequence otherSequence)throws Exception{
+	/**
+	 * replaces all values after the provided start index
+	 * @param startIndex you know that 
+	 * 'provided start index' i was tlaking about??
+	 * @param otherSequence the sequence you wish to append to the end
+	 * 
+	 */
+	public void tailReplace (int startIndex, RLESequence otherSequence){
 		int counter=0;
 		int internalIndex=0;
 		int indexFromEnd=0;
@@ -57,16 +91,12 @@ public class RLESequence {
 				}
 				counter++;
 			}
+		
 		}
-	//	System.out.println("internalIndex " + internalIndex);
-	//	System.out.println("indexFromEnd" + indexFromEnd);
-	//	System.out.println(this);
-	//	System.out.println(compressedSequence.size());
-	//	System.out.println(compressedSequence.get(2));
+
 		
 		for(int i=compressedSequence.size()-1;i>internalIndex;i--){
-		//	System.out.println("wtf");
-		//	System.out.println(compressedSequence.get(i));
+	
 			compressedSequence.remove(i);
 		}
 		compressedSequence.get(internalIndex).setNumber(
@@ -75,19 +105,14 @@ public class RLESequence {
 			compressedSequence.remove(internalIndex);
 			internalIndex--;
 		}
-		//System.out.println("hey "+this);
-		
-		
-		Entry cat = compareTwo(otherSequence.compressedSequence.get(0),
+	
+		Entry compareEntries = compareTwo(otherSequence.compressedSequence.get(0),
 							   compressedSequence.get(internalIndex));
-		//System.out.println("catVal=" + cat);
-		if(cat!=null){
-			System.out.println(indexFromEnd);
-			compressedSequence.set(internalIndex, cat);
+		if(compareEntries!=null){ //i.e. they aren't unequal
+			compressedSequence.set(internalIndex, compareEntries);
 		}
 		else{
-			compressedSequence.get(internalIndex).setNumber(
-					compressedSequence.get(internalIndex).getNumber()-1);
+		
 			if(compressedSequence.get(internalIndex).getNumber()==0){
 				compressedSequence.set(internalIndex, otherSequence.compressedSequence.get(0));
 			}
@@ -123,6 +148,13 @@ public class RLESequence {
 		
 	}
 	
+ 	/**
+ 	 * sets a given uncompressed index to a value you want
+ 	 * @param index the uncompressed index where that value is
+ 	 * @param val the value you wish to change to
+ 	 * @throws Exception if you put in a bad value or 
+ 	 * put in too high of an index
+ 	 */
 	public void set(int index, int val) throws Exception{
 		int[] indices = getInternalIndices(index);
 		Entry indexedEntry=compressedSequence.get(indices[0]);
@@ -143,23 +175,36 @@ public class RLESequence {
 		
 	}
 	
+	/**
+	 * priavate! Why is this method so long?
+	 * Because it has to deal with a lot of checking and 
+	 * recompression to make sure that everything is compressed
+	 * correctly and in the right place.
+	 * @param entryIndex see step 1
+	 * @param indexWithinEntry see step1
+	 * @param val the value, just like step 1 which you should have looked 
+	 * at
+	 * @throws Exception same as step 1
+	 */
 	private void setStepTwo(int entryIndex, int indexWithinEntry, int val)throws Exception{
 		Entry previousEntry=null;
-		//System.out.println("entryIndex=" + entryIndex);
+	
 		Entry currentEntry = compressedSequence.get(entryIndex);
-		//System.out.println("containingIndex="+containingIndex);
+	
 		if(entryIndex>0){
 			previousEntry=compressedSequence.get(entryIndex-1);
-			System.out.println("indexMinusOne="+previousEntry);
+	
 		}
 		Entry nextEntry=null;
 		if(entryIndex<compressedSequence.size()-1){
 			nextEntry=compressedSequence.get(entryIndex+1);
-			System.out.println("indexPlusOne="+nextEntry);
+	
 		}
 		//case 1
 		if (currentEntry.getNumber()==1){
+			
 			currentEntry.setValue(val);
+			
 			Entry firstCompare = compareTwo(previousEntry,currentEntry);
 			Entry secondCompare = compareTwo(currentEntry,nextEntry);
 	
@@ -175,7 +220,7 @@ public class RLESequence {
 				compressedSequence.remove(entryIndex+1);
 			}
 			else if(firstCompare!=null){
-				compressedSequence.set(entryIndex, secondCompare);
+				compressedSequence.set(entryIndex, firstCompare);
 				compressedSequence.remove(entryIndex-1);
 			}
 		
@@ -190,12 +235,11 @@ public class RLESequence {
 			for(int i=0;i<currentEntry.getNumber();i++){
 				if(i==indexWithinEntry){
 					if(i!=0){
-						System.out.println("previousStuff is good");
-						System.out.println(i);
+
 						previousStuff=new Entry(i,currentEntry.getValue());
 					}
 					if(i<currentEntry.getNumber()-1){
-						System.out.println("nextStuff is good");
+	
 						nextStuff=new Entry(currentEntry.getNumber()-i-1,currentEntry.getValue());
 					}
 					userInsertedEntry = new Entry(1, val);
@@ -203,9 +247,6 @@ public class RLESequence {
 
 			}
 			if(previousStuff!=null&&nextStuff!=null){
-				System.out.println("previousStuff=" + previousStuff);
-				System.out.println("nextStuff=" + nextStuff);
-				System.out.println("here");
 				compressedSequence.set(entryIndex,userInsertedEntry);
 				compressedSequence.add(entryIndex+1,nextStuff);
 				compressedSequence.add(entryIndex,previousStuff);
@@ -224,8 +265,6 @@ public class RLESequence {
 			else if(nextStuff!=null){
 				Entry two= compareTwo(previousEntry,userInsertedEntry);
 				if(two!=null){
-					System.out.println("heree");
-					System.out.println(two);
 					compressedSequence.set(entryIndex-1, two);
 					currentEntry.setNumber(currentEntry.getNumber()-1);			
 				}
@@ -245,11 +284,12 @@ public class RLESequence {
 	}
 	/**
 	 * 
-	 * @param firstEntry
-	 * @param secondEntry
+	 * @param firstEntry the first entry you wish to compare
+	 * @param secondEntry the <s>first</s> second (hooray for strike tags)
 	 * @return null if they aren't equal
+	 * 			<br> the new combined entry if they are equal
 	 */
-	private Entry compareTwo(Entry firstEntry, Entry secondEntry) throws Exception{
+	private Entry compareTwo(Entry firstEntry, Entry secondEntry)  {
 		Entry returnEntry=null;
 		if(firstEntry==null||secondEntry==null){
 			return returnEntry;
@@ -257,12 +297,21 @@ public class RLESequence {
 		int finalValue=firstEntry.getNumber();
 		if(firstEntry.getValue()==secondEntry.getValue()){
 			finalValue+=secondEntry.getNumber();
+			try{
 			returnEntry = new Entry(finalValue,firstEntry.getValue());
+			}
+			catch (Exception e){
+				return null;
+			}
 		}
 		
 		return returnEntry;
 	}
-
+	/**
+	 * very self explanatory
+	 * @param other the other RLESequence you're comparing
+	 * @return true if they equal each other
+	 */
 	public boolean equals(RLESequence other){
 		
 		if(other.compressedSequence.size()!=compressedSequence.size()){
@@ -292,7 +341,7 @@ public class RLESequence {
 				if(counter==externalIndex){
 					entryIndex=j;
 					internalIndex=k;
-					System.out.println("newIndex="+internalIndex);
+				
 					int[] returnVal={entryIndex,internalIndex};
 					return returnVal;
 				}
@@ -304,7 +353,10 @@ public class RLESequence {
 		int[] returnVal={entryIndex,internalIndex};
 		return returnVal;
 	}
-
+/**
+ * 
+ * @return the uncompressed array
+ */
 	public int[] toArray(){
 		int[] returnArray;
 		int counter=0;
@@ -331,7 +383,10 @@ public class RLESequence {
 		}
 		return returnArray;
 	}
-	
+	/**
+	 * 
+	 * @return the internal representation. in case you're interested
+	 */
 	public String internalToString(){
 		String returnString="";
 		returnString+="(";
@@ -344,7 +399,10 @@ public class RLESequence {
 		return returnString;
 	}
 	
-	public String toString(){
+/**
+ * 	
+ */
+public String toString(){
 		String returnString="";
 		returnString+="[";
 		for(int i=0;i<compressedSequence.size();i++){

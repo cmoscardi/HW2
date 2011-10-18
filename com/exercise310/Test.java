@@ -5,7 +5,7 @@ public class Test {
 	/**
 	 * @param args
 	 */
-	/**
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		TimeOfDay now=new TimeOfDay(12,30,27,"pm");
@@ -14,5 +14,5 @@ public class Test {
 		System.out.println(now.secondsFrom(later));
 		System.out.println(later.secondsFrom(now));
 	} 
-*/
+
 }

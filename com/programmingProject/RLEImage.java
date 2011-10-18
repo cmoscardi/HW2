@@ -1,15 +1,33 @@
 package com.programmingProject;
 
 import java.util.ArrayList;
-
+/**
+ * This broadens the functionality 
+ * of RLESequence. It turns those sequences
+ * into a two-dimensional representation. So an image
+ * might be a good example of what this can compress.
+ * @author Christian
+ *
+ */
 public class RLEImage {
 	private RLESequence[] compressedImage;
 	private ArrayList<RLEEntry> compressedSequence;
+	/**
+	 * Takes the 2d array and compresses it into a
+	 * RLE encoded image
+	 * @param image the 2d array which you want compressed
+	 * @throws Exception if you're a bad boy/girl and exceed
+	 * 255 or under-ceed 0
+	 */
 	public RLEImage(int[][] image) throws Exception{
 		compressedSequence=new ArrayList<RLEEntry>();
 		compress(image);
 	}
-	
+	/**
+	 * private!
+	 * @return have you no decency, sir?
+	 * @throws Exception this is private!!
+	 */
 	private int[][] decompress()throws Exception{
 		int[][] returnVal;
 		int counter = 0;
@@ -41,6 +59,11 @@ public class RLEImage {
 		
 	}
 	
+	/**
+	 * have you no decency!
+	 * @param image private!
+	 * @throws Exception what if i were indecent!
+	 */
 	private void compress(int[][] image) throws Exception{
 		compressedImage=new RLESequence[image.length];
 		int counter=0;
@@ -60,6 +83,10 @@ public class RLEImage {
 		compressedSequence.trimToSize();
 	}
 	
+	/**
+	 * 
+	 * @return the uncompressed array
+	 */
 	public int[][] toArray(){
 		
 		try{
@@ -72,6 +99,9 @@ public class RLEImage {
 			//honestly if this happens, cry.
 		}
 	}
+	/**
+	 * @return the pretty picture
+	 */
 	public String toString() {
 		try{
 			String returnString="";
